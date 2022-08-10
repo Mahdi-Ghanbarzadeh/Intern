@@ -1,4 +1,4 @@
-// 9
+// 10
 import {
   AutoComplete,
   Button,
@@ -18,18 +18,53 @@ import {
   Upload,
   DatePicker,
   TimePicker,
+  Avatar,
+  Typography,
+  Modal,
 } from "antd";
 import {
   MinusCircleOutlined,
   PlusOutlined,
   InboxOutlined,
   UploadOutlined,
+  SmileOutlined,
+  UserOutlined,
 } from "@ant-design/icons";
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import "antd/dist/antd.css"; // or 'antd/dist/antd.less'
 import "./App.css";
 const { Option } = Select;
 const { RangePicker } = DatePicker;
+
+const residences = [
+  {
+    value: "iran",
+    label: "Iran",
+    children: [
+      {
+        value: "isfahan",
+        label: "Isfahan",
+        children: [
+          {
+            value: "isfahan",
+            label: "Isfahan",
+          },
+        ],
+      },
+      { value: "tehran", label: "Tehran" },
+    ],
+  },
+  {
+    value: "netherland",
+    label: "Netherland",
+    children: [
+      {
+        value: "limburg",
+        label: "Limburg",
+      },
+    ],
+  },
+];
 
 const config = {
   rules: [
@@ -91,8 +126,73 @@ const normFile = (e) => {
   return e?.fileList;
 };
 
+// reset form fields when modal is form, closed
+const useResetFormOnCloseModal = ({ form, visible }) => {
+  const prevVisibleRef = useRef();
+  useEffect(() => {
+    prevVisibleRef.current = visible;
+  }, [visible]);
+  const prevVisible = prevVisibleRef.current;
+  useEffect(() => {
+    if (!visible && prevVisible) {
+      form.resetFields();
+    }
+  }, [form, prevVisible, visible]);
+};
+
+const ModalForm = ({ visible, onCancel }) => {
+  const [form] = Form.useForm();
+  useResetFormOnCloseModal({
+    form,
+    visible,
+  });
+
+  const onOk = () => {
+    form.submit();
+  };
+
+  return (
+    <Modal title="Add User" visible={visible} onOk={onOk} onCancel={onCancel}>
+      <Form form={form} layout="vertical" name="userForm">
+        <Form.Item
+          name="name"
+          label="User Name"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <Input />
+        </Form.Item>
+        <Form.Item
+          name="age"
+          label="User Age"
+          rules={[
+            {
+              required: true,
+            },
+          ]}
+        >
+          <InputNumber />
+        </Form.Item>
+      </Form>
+    </Modal>
+  );
+};
+
 const App = () => {
   const [form] = Form.useForm();
+
+  const [visible, setVisible] = useState(false);
+
+  const showUserModal = () => {
+    setVisible(true);
+  };
+
+  const hideUserModal = () => {
+    setVisible(false);
+  };
 
   const onFinish = (values) => {
     console.log("Success: ", values);
@@ -140,84 +240,145 @@ const App = () => {
   }));
   return (
     <div className="App">
-      <Form
-        {...formItemLayout}
-        form={form}
-        name="register"
-        onFinish={onFinish}
-        initialValues={{
-          residence: ["zhejiang", "hangzhou", "xihu"],
-          prefix: "98",
+      <Form.Provider
+        onFormFinish={(name, { values, forms }) => {
+          if (name === "userForm") {
+            const { register } = forms;
+            const users = register.getFieldValue("users") || [];
+            register.setFieldsValue({
+              users: [...users, values],
+            });
+            setVisible(false);
+          }
         }}
-        scrollToFirstError
       >
-        <Form.Item
-          name="name"
-          label="Name"
-          rules={[
-            {
-              required: true,
-              message: "Please input your Name",
-            },
-          ]}
+        <Form
+          {...formItemLayout}
+          form={form}
+          name="register"
+          onFinish={onFinish}
+          initialValues={{
+            residence: ["zhejiang", "hangzhou", "xihu"],
+            prefix: "98",
+          }}
+          scrollToFirstError
         >
-          <Input />
-        </Form.Item>
-
-        <Form.Item name="date-picker" label="DatePicker" {...config}>
-          <DatePicker />
-        </Form.Item>
-
-        <Form.Item name="month-picker" label="MonthPicker" {...config}>
-          <DatePicker picker="month" />
-        </Form.Item>
-
-        <Form.Item name="range-picker" label="RangePicker" {...rangeConfig}>
-          <RangePicker />
-        </Form.Item>
-
-        <Form.Item name="time-picker" label="TimePicker" {...config}>
-          <TimePicker />
-        </Form.Item>
-
-        <Form.Item
-          name="upload"
-          label="Upload"
-          valuePropName="fileList"
-          getValueFromEvent={normFile}
-        >
-          <Upload name="logo" action="/upload.do" listType="picture">
-            <Button icon={<UploadOutlined />}>Click to upload</Button>
-          </Upload>
-        </Form.Item>
-
-        <Form.Item label="Dragger">
           <Form.Item
-            name="dragger"
-            valuePropName="fileList"
-            getValueFromEvent={normFile}
-            noStyle
+            name="name"
+            label="Name"
+            rules={[
+              {
+                required: true,
+                message: "Please input your Name",
+              },
+            ]}
           >
-            <Upload.Dragger name="files" action="/upload.do">
-              <p className="ant-upload-drag-icon">
-                <InboxOutlined />
-              </p>
-              <p className="ant-upload-text">
-                Click or drag file to this area to upload
-              </p>
-              <p className="ant-upload-hint">
-                Support for a single or bulk upload.
-              </p>
-            </Upload.Dragger>
+            <Input />
           </Form.Item>
-        </Form.Item>
 
-        <Form.Item {...tailFormItemLayout}>
-          <Button type="primary" htmlType="submit">
-            Submit
-          </Button>
-        </Form.Item>
-      </Form>
+          <Form.Item
+            name="country"
+            label="Country"
+            rules={[
+              {
+                required: true,
+                message: "Please select Country!",
+              },
+            ]}
+          >
+            <Select placeholder="select your country">
+              <Option value="Iran">Iran</Option>
+              <Option value="Netherland">Netherland</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="city"
+            label="City"
+            rules={[
+              {
+                required: true,
+                message: "Please select City!",
+              },
+            ]}
+          >
+            <Select placeholder="select your city">
+              <Option value="Tehran">Tehran</Option>
+              <Option value="Isfahan">Isfahan</Option>
+            </Select>
+          </Form.Item>
+
+          <Form.Item
+            name="countryCity"
+            label="Country - City"
+            rules={[
+              {
+                type: "array",
+                required: true,
+                message: "Please select your habitual residence!",
+              },
+            ]}
+          >
+            <Cascader options={residences} />
+          </Form.Item>
+
+          <Form.Item
+            name="group"
+            label="Group Name"
+            rules={[
+              {
+                required: true,
+              },
+            ]}
+          >
+            <Input />
+          </Form.Item>
+          <Form.Item
+            label="User List"
+            shouldUpdate={(prevValues, curValues) =>
+              prevValues.users !== curValues.users
+            }
+          >
+            {({ getFieldValue }) => {
+              const users = getFieldValue("users") || [];
+              return users.length ? (
+                <ul>
+                  {users.map((user, index) => (
+                    <li key={index} className="user">
+                      <Avatar icon={<UserOutlined />} />
+                      {user.name} - {user.age}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <Typography.Text className="ant-form-text" type="secondary">
+                  ( <SmileOutlined /> No user yet. )
+                </Typography.Text>
+              );
+            }}
+          </Form.Item>
+
+          <Form.Item>
+            <Button
+              htmlType="button"
+              style={{
+                margin: "0 8px",
+              }}
+              onClick={showUserModal}
+            >
+              Add User
+            </Button>
+          </Form.Item>
+
+          <Form.Item {...tailFormItemLayout}>
+            <Button type="primary" htmlType="submit">
+              Submit
+            </Button>
+          </Form.Item>
+
+          <ModalForm visible={visible} onCancel={hideUserModal} />
+        </Form>
+      </Form.Provider>
     </div>
   );
 };
