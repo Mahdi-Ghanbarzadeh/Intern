@@ -1,3 +1,4 @@
+// 6
 import {
   AutoComplete,
   Button,
@@ -13,7 +14,9 @@ import {
   Switch,
   Rate,
   Radio,
+  Space,
 } from "antd";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
 import React, { useState } from "react";
 import "antd/dist/antd.css"; // or 'antd/dist/antd.less'
 import "./App.css";
@@ -22,18 +25,18 @@ const { Option } = Select;
 const formItemLayout = {
   labelCol: {
     xs: {
-      span: 24,
+      span: 0,
     },
     sm: {
-      span: 8,
+      span: 0,
     },
   },
   wrapperCol: {
     xs: {
-      span: 24,
+      span: 0,
     },
     sm: {
-      span: 16,
+      span: 0,
     },
   },
 };
@@ -110,6 +113,60 @@ const App = () => {
         }}
         scrollToFirstError
       >
+        <Form.List name="users">
+          {(fields, { add, remove }) => (
+            <>
+              {fields.map(({ key, name, ...restField }) => (
+                <Space
+                  key={key}
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    marginBottom: 8,
+                  }}
+                  align="baseline"
+                >
+                  <Form.Item
+                    {...restField}
+                    name={[name, "first"]}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Missing first name",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="First Name" />
+                  </Form.Item>
+                  <Form.Item
+                    {...restField}
+                    name={[name, "last"]}
+                    rules={[
+                      {
+                        required: true,
+                        message: "Missing last name",
+                      },
+                    ]}
+                  >
+                    <Input placeholder="Last Name" />
+                  </Form.Item>
+                  <MinusCircleOutlined onClick={() => remove(name)} />
+                </Space>
+              ))}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  block
+                  icon={<PlusOutlined />}
+                >
+                  Add field
+                </Button>
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
+
         <Form.Item
           name="email"
           label="E-mail"
@@ -168,23 +225,6 @@ const App = () => {
         </Form.Item>
 
         <Form.Item
-          name="select"
-          label="Select"
-          hasFeedback
-          rules={[
-            {
-              required: true,
-              message: "Please select your country!",
-            },
-          ]}
-        >
-          <Select placeholder="Please select a country">
-            <Option value="iran">Iran</Option>
-            <Option value="china">China</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item
           name="phone"
           label="Phone Number"
           rules={[
@@ -220,36 +260,6 @@ const App = () => {
           />
         </Form.Item>
 
-        <Form.Item
-          name="intro"
-          label="Intro"
-          rules={[
-            {
-              required: true,
-              message: "Please input Intro",
-            },
-          ]}
-        >
-          <Input.TextArea showCount maxLength={100} />
-        </Form.Item>
-
-        <Form.Item
-          name="gender"
-          label="Gender"
-          rules={[
-            {
-              required: true,
-              message: "Please select gender!",
-            },
-          ]}
-        >
-          <Select placeholder="select your gender">
-            <Option value="male">Male</Option>
-            <Option value="female">Female</Option>
-            <Option value="other">Other</Option>
-          </Select>
-        </Form.Item>
-
         <Form.Item name="slider" label="Slider">
           <Slider
             marks={{
@@ -263,113 +273,6 @@ const App = () => {
           />
         </Form.Item>
 
-        <Form.Item
-          name="select-multiple"
-          label="Select[multiple]"
-          rules={[
-            {
-              required: true,
-              message: "Please select your favourite colors!",
-              type: "array",
-            },
-          ]}
-        >
-          <Select mode="multiple" placeholder="Please select favourite colors">
-            <Option value="red">Red</Option>
-            <Option value="green">Green</Option>
-            <Option value="blue">Blue</Option>
-          </Select>
-        </Form.Item>
-
-        <Form.Item label="InputNumber">
-          <Form.Item name="input-number" noStyle>
-            <InputNumber min={1} max={10} />
-          </Form.Item>
-          <span className="ant-form-text"> machines</span>
-        </Form.Item>
-
-        <Form.Item name="switch" label="Switch" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-
-        <Form.Item name="radio-group" label="Radio.Group">
-          <Radio.Group>
-            <Radio value="a">item 1</Radio>
-            <Radio value="b">item 2</Radio>
-            <Radio value="c">item 3</Radio>
-          </Radio.Group>
-        </Form.Item>
-
-        <Form.Item
-          name="radio-button"
-          label="Radio.Button"
-          rules={[{ required: true, message: "Please pick an item!" }]}
-        >
-          <Radio.Group>
-            <Radio.Button value="a">item 1</Radio.Button>
-            <Radio.Button value="b">item 2</Radio.Button>
-            <Radio.Button value="c">item 3</Radio.Button>
-          </Radio.Group>
-        </Form.Item>
-
-        <Form.Item name="checkbox-group" label="Checkbox.Group">
-          <Checkbox.Group>
-            <Row>
-              <Col span={8}>
-                <Checkbox value="A" style={{ lineHeight: "32px" }}>
-                  A
-                </Checkbox>
-              </Col>
-              <Col span={8}>
-                <Checkbox value="B" style={{ lineHeight: "32px" }}>
-                  B
-                </Checkbox>
-              </Col>
-              <Col span={8}>
-                <Checkbox value="C" style={{ lineHeight: "32px" }}>
-                  C
-                </Checkbox>
-              </Col>
-              <Col span={8}>
-                <Checkbox value="D" style={{ lineHeight: "32px" }}>
-                  D
-                </Checkbox>
-              </Col>
-              <Col span={8}>
-                <Checkbox value="E" style={{ lineHeight: "32px" }}>
-                  E
-                </Checkbox>
-              </Col>
-              <Col span={8}>
-                <Checkbox value="F" style={{ lineHeight: "32px" }}>
-                  F
-                </Checkbox>
-              </Col>
-            </Row>
-          </Checkbox.Group>
-        </Form.Item>
-
-        <Form.Item name="rate" label="Rate">
-          <Rate />
-        </Form.Item>
-
-        <Form.Item
-          name="agreement"
-          valuePropName="checked"
-          rules={[
-            {
-              validator: (_, value) =>
-                value
-                  ? Promise.resolve()
-                  : Promise.reject(new Error("Should accept agreement")),
-            },
-          ]}
-          {...tailFormItemLayout}
-        >
-          <Checkbox>
-            I have read the <a href="">agreement</a>
-          </Checkbox>
-        </Form.Item>
         <Form.Item {...tailFormItemLayout}>
           <Button type="primary" htmlType="submit">
             Submit
