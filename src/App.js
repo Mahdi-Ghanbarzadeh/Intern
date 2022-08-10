@@ -1,4 +1,4 @@
-// 7
+// 8
 import {
   AutoComplete,
   Button,
@@ -50,6 +50,13 @@ const tailFormItemLayout = {
       span: 16,
       offset: 8,
     },
+  },
+};
+
+const formItemLayoutWithOutLabel = {
+  wrapperCol: {
+    xs: { span: 24, offset: 0 },
+    sm: { span: 20, offset: 4 },
   },
 };
 
@@ -114,103 +121,132 @@ const App = () => {
         scrollToFirstError
       >
         <Form.Item
-          name="email"
-          label="E-mail"
+          name="company-name"
+          label="Company Name"
           rules={[
             {
-              type: "email",
-              message: "The input is not valid E-mail!",
-            },
-            {
               required: true,
-              message: "Please input your E-mail!",
+              message: "Please input your Company Name",
             },
           ]}
         >
           <Input />
         </Form.Item>
 
-        <Form.Item
-          name="phone"
-          label="Phone Number"
-          rules={[
-            {
-              required: true,
-              message: "Please input your phone number!",
-            },
-          ]}
-        >
-          <Input
-            addonBefore={prefixSelector}
-            style={{
-              width: "100%",
-            }}
-          />
+        <Form.List name="names">
+          {(fields, { add, remove }, { errors }) => (
+            <>
+              {fields.map((field, index) => (
+                <Form.Item
+                  {...(index === 0
+                    ? formItemLayout
+                    : formItemLayoutWithOutLabel)}
+                  label={index === 0 ? "Passengers" : ""}
+                  required={false}
+                  key={field.key}
+                >
+                  <Form.Item
+                    {...field}
+                    validateTrigger={["onChange", "onBlur"]}
+                    rules={[
+                      {
+                        required: true,
+                        whitespace: true,
+                        message:
+                          "Please input passenger's name or delete this field.",
+                      },
+                    ]}
+                    noStyle
+                  >
+                    <Input
+                      placeholder="passenger name"
+                      style={{ width: "60%" }}
+                    />
+                  </Form.Item>
+                  {fields.length > 1 ? (
+                    <MinusCircleOutlined
+                      className="dynamic-delete-button"
+                      onClick={() => remove(field.name)}
+                    />
+                  ) : null}
+                </Form.Item>
+              ))}
+              <Form.Item>
+                <Button
+                  type="dashed"
+                  onClick={() => add()}
+                  style={{ width: "60%" }}
+                  icon={<PlusOutlined />}
+                >
+                  Add New Passenger
+                </Button>
+                <Form.ErrorList errors={errors} />
+              </Form.Item>
+            </>
+          )}
+        </Form.List>
+
+        <Form.Item name="radio-group" label="Radio.Group">
+          <Radio.Group>
+            <Radio value="a">tour 1</Radio>
+            <Radio value="b">tour 2</Radio>
+            <Radio value="c">tour 3</Radio>
+          </Radio.Group>
         </Form.Item>
 
         <Form.Item
-          name="gender"
-          label="Gender[only one]"
-          rules={[
-            {
-              required: true,
-              message: "Please select gender!",
-            },
-          ]}
+          name="radio-button"
+          label="Radio.Button"
+          rules={[{ required: true, message: "Please pick an item!" }]}
         >
-          <Select placeholder="select your gender">
-            <Option value="male">Male</Option>
-            <Option value="female">Female</Option>
-            <Option value="other">Other</Option>
-          </Select>
+          <Radio.Group>
+            <Radio.Button value="a">tour 1</Radio.Button>
+            <Radio.Button value="b">tour 2</Radio.Button>
+            <Radio.Button value="c">tour 3</Radio.Button>
+          </Radio.Group>
         </Form.Item>
 
-        <Form.Item
-          name="select-multiple"
-          label="Select[multiple]"
-          rules={[
-            {
-              required: true,
-              message: "Please select your favourite colors!",
-              type: "array",
-            },
-          ]}
-        >
-          <Select mode="multiple" placeholder="Please select favourite colors">
-            <Option value="red">Red</Option>
-            <Option value="green">Green</Option>
-            <Option value="blue">Blue</Option>
-          </Select>
+        <Form.Item name="checkbox-group" label="Checkbox.Group">
+          <Checkbox.Group>
+            <Row>
+              <Col span={8}>
+                <Checkbox value="A" style={{ lineHeight: "32px" }}>
+                  Option 1
+                </Checkbox>
+              </Col>
+              <Col span={8}>
+                <Checkbox value="B" style={{ lineHeight: "32px" }}>
+                  Option 2
+                </Checkbox>
+              </Col>
+              <Col span={8}>
+                <Checkbox value="C" style={{ lineHeight: "32px" }}>
+                  Option 3
+                </Checkbox>
+              </Col>
+              <Col span={8}>
+                <Checkbox value="D" style={{ lineHeight: "32px" }}>
+                  Option 4
+                </Checkbox>
+              </Col>
+              <Col span={8}>
+                <Checkbox value="E" style={{ lineHeight: "32px" }}>
+                  Option 5
+                </Checkbox>
+              </Col>
+              <Col span={8}>
+                <Checkbox value="F" style={{ lineHeight: "32px" }}>
+                  Option 6
+                </Checkbox>
+              </Col>
+            </Row>
+          </Checkbox.Group>
         </Form.Item>
 
-        <Form.Item label="InputNumber">
-          <Form.Item name="input-number" noStyle>
-            <InputNumber min={1} max={10} />
-          </Form.Item>
-          <span className="ant-form-text"> machines</span>
+        <Form.Item name="rate" label="Rate">
+          <Rate />
         </Form.Item>
 
-        <Form.Item name="switch" label="Switch" valuePropName="checked">
-          <Switch />
-        </Form.Item>
-
-        <Form.Item
-          name="agreement"
-          valuePropName="checked"
-          rules={[
-            {
-              validator: (_, value) =>
-                value
-                  ? Promise.resolve()
-                  : Promise.reject(new Error("Should accept agreement")),
-            },
-          ]}
-          {...tailFormItemLayout}
-        >
-          <Checkbox>
-            I have read the <a href="">agreement</a>
-          </Checkbox>
-        </Form.Item>
         <Form.Item {...tailFormItemLayout}>
           <Button type="primary" htmlType="submit">
             Submit
