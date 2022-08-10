@@ -1,4 +1,4 @@
-// 8
+// 9
 import {
   AutoComplete,
   Button,
@@ -15,12 +15,40 @@ import {
   Rate,
   Radio,
   Space,
+  Upload,
+  DatePicker,
+  TimePicker,
 } from "antd";
-import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import {
+  MinusCircleOutlined,
+  PlusOutlined,
+  InboxOutlined,
+  UploadOutlined,
+} from "@ant-design/icons";
 import React, { useState } from "react";
 import "antd/dist/antd.css"; // or 'antd/dist/antd.less'
 import "./App.css";
 const { Option } = Select;
+const { RangePicker } = DatePicker;
+
+const config = {
+  rules: [
+    {
+      type: "object",
+      required: true,
+      message: "Please select time!",
+    },
+  ],
+};
+const rangeConfig = {
+  rules: [
+    {
+      type: "array",
+      required: true,
+      message: "Please select time!",
+    },
+  ],
+};
 
 const formItemLayout = {
   labelCol: {
@@ -53,11 +81,14 @@ const tailFormItemLayout = {
   },
 };
 
-const formItemLayoutWithOutLabel = {
-  wrapperCol: {
-    xs: { span: 24, offset: 0 },
-    sm: { span: 20, offset: 4 },
-  },
+const normFile = (e) => {
+  console.log("Upload event:", e);
+
+  if (Array.isArray(e)) {
+    return e;
+  }
+
+  return e?.fileList;
 };
 
 const App = () => {
@@ -121,130 +152,64 @@ const App = () => {
         scrollToFirstError
       >
         <Form.Item
-          name="company-name"
-          label="Company Name"
+          name="name"
+          label="Name"
           rules={[
             {
               required: true,
-              message: "Please input your Company Name",
+              message: "Please input your Name",
             },
           ]}
         >
           <Input />
         </Form.Item>
 
-        <Form.List name="names">
-          {(fields, { add, remove }, { errors }) => (
-            <>
-              {fields.map((field, index) => (
-                <Form.Item
-                  {...(index === 0
-                    ? formItemLayout
-                    : formItemLayoutWithOutLabel)}
-                  label={index === 0 ? "Passengers" : ""}
-                  required={false}
-                  key={field.key}
-                >
-                  <Form.Item
-                    {...field}
-                    validateTrigger={["onChange", "onBlur"]}
-                    rules={[
-                      {
-                        required: true,
-                        whitespace: true,
-                        message:
-                          "Please input passenger's name or delete this field.",
-                      },
-                    ]}
-                    noStyle
-                  >
-                    <Input
-                      placeholder="passenger name"
-                      style={{ width: "60%" }}
-                    />
-                  </Form.Item>
-                  {fields.length > 1 ? (
-                    <MinusCircleOutlined
-                      className="dynamic-delete-button"
-                      onClick={() => remove(field.name)}
-                    />
-                  ) : null}
-                </Form.Item>
-              ))}
-              <Form.Item>
-                <Button
-                  type="dashed"
-                  onClick={() => add()}
-                  style={{ width: "60%" }}
-                  icon={<PlusOutlined />}
-                >
-                  Add New Passenger
-                </Button>
-                <Form.ErrorList errors={errors} />
-              </Form.Item>
-            </>
-          )}
-        </Form.List>
+        <Form.Item name="date-picker" label="DatePicker" {...config}>
+          <DatePicker />
+        </Form.Item>
 
-        <Form.Item name="radio-group" label="Radio.Group">
-          <Radio.Group>
-            <Radio value="a">tour 1</Radio>
-            <Radio value="b">tour 2</Radio>
-            <Radio value="c">tour 3</Radio>
-          </Radio.Group>
+        <Form.Item name="month-picker" label="MonthPicker" {...config}>
+          <DatePicker picker="month" />
+        </Form.Item>
+
+        <Form.Item name="range-picker" label="RangePicker" {...rangeConfig}>
+          <RangePicker />
+        </Form.Item>
+
+        <Form.Item name="time-picker" label="TimePicker" {...config}>
+          <TimePicker />
         </Form.Item>
 
         <Form.Item
-          name="radio-button"
-          label="Radio.Button"
-          rules={[{ required: true, message: "Please pick an item!" }]}
+          name="upload"
+          label="Upload"
+          valuePropName="fileList"
+          getValueFromEvent={normFile}
         >
-          <Radio.Group>
-            <Radio.Button value="a">tour 1</Radio.Button>
-            <Radio.Button value="b">tour 2</Radio.Button>
-            <Radio.Button value="c">tour 3</Radio.Button>
-          </Radio.Group>
+          <Upload name="logo" action="/upload.do" listType="picture">
+            <Button icon={<UploadOutlined />}>Click to upload</Button>
+          </Upload>
         </Form.Item>
 
-        <Form.Item name="checkbox-group" label="Checkbox.Group">
-          <Checkbox.Group>
-            <Row>
-              <Col span={8}>
-                <Checkbox value="A" style={{ lineHeight: "32px" }}>
-                  Option 1
-                </Checkbox>
-              </Col>
-              <Col span={8}>
-                <Checkbox value="B" style={{ lineHeight: "32px" }}>
-                  Option 2
-                </Checkbox>
-              </Col>
-              <Col span={8}>
-                <Checkbox value="C" style={{ lineHeight: "32px" }}>
-                  Option 3
-                </Checkbox>
-              </Col>
-              <Col span={8}>
-                <Checkbox value="D" style={{ lineHeight: "32px" }}>
-                  Option 4
-                </Checkbox>
-              </Col>
-              <Col span={8}>
-                <Checkbox value="E" style={{ lineHeight: "32px" }}>
-                  Option 5
-                </Checkbox>
-              </Col>
-              <Col span={8}>
-                <Checkbox value="F" style={{ lineHeight: "32px" }}>
-                  Option 6
-                </Checkbox>
-              </Col>
-            </Row>
-          </Checkbox.Group>
-        </Form.Item>
-
-        <Form.Item name="rate" label="Rate">
-          <Rate />
+        <Form.Item label="Dragger">
+          <Form.Item
+            name="dragger"
+            valuePropName="fileList"
+            getValueFromEvent={normFile}
+            noStyle
+          >
+            <Upload.Dragger name="files" action="/upload.do">
+              <p className="ant-upload-drag-icon">
+                <InboxOutlined />
+              </p>
+              <p className="ant-upload-text">
+                Click or drag file to this area to upload
+              </p>
+              <p className="ant-upload-hint">
+                Support for a single or bulk upload.
+              </p>
+            </Upload.Dragger>
+          </Form.Item>
         </Form.Item>
 
         <Form.Item {...tailFormItemLayout}>
