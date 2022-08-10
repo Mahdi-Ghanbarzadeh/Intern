@@ -1,4 +1,4 @@
-// 6
+// 7
 import {
   AutoComplete,
   Button,
@@ -113,60 +113,6 @@ const App = () => {
         }}
         scrollToFirstError
       >
-        <Form.List name="users">
-          {(fields, { add, remove }) => (
-            <>
-              {fields.map(({ key, name, ...restField }) => (
-                <Space
-                  key={key}
-                  style={{
-                    display: "flex",
-                    justifyContent: "center",
-                    marginBottom: 8,
-                  }}
-                  align="baseline"
-                >
-                  <Form.Item
-                    {...restField}
-                    name={[name, "first"]}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Missing first name",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="First Name" />
-                  </Form.Item>
-                  <Form.Item
-                    {...restField}
-                    name={[name, "last"]}
-                    rules={[
-                      {
-                        required: true,
-                        message: "Missing last name",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Last Name" />
-                  </Form.Item>
-                  <MinusCircleOutlined onClick={() => remove(name)} />
-                </Space>
-              ))}
-              <Form.Item>
-                <Button
-                  type="dashed"
-                  onClick={() => add()}
-                  block
-                  icon={<PlusOutlined />}
-                >
-                  Add field
-                </Button>
-              </Form.Item>
-            </>
-          )}
-        </Form.List>
-
         <Form.Item
           name="email"
           label="E-mail"
@@ -182,46 +128,6 @@ const App = () => {
           ]}
         >
           <Input />
-        </Form.Item>
-
-        <Form.Item
-          name="password"
-          label="Password"
-          rules={[
-            {
-              required: true,
-              message: "Please input your password!",
-            },
-          ]}
-          hasFeedback
-        >
-          <Input.Password />
-        </Form.Item>
-
-        <Form.Item
-          name="confirm"
-          label="Confirm Password"
-          dependencies={["password"]}
-          hasFeedback
-          rules={[
-            {
-              required: true,
-              message: "Please confirm your password!",
-            },
-            ({ getFieldValue }) => ({
-              validator(_, value) {
-                if (!value || getFieldValue("password") === value) {
-                  return Promise.resolve();
-                }
-
-                return Promise.reject(
-                  new Error("The two passwords that you entered do not match!")
-                );
-              },
-            }),
-          ]}
-        >
-          <Input.Password />
         </Form.Item>
 
         <Form.Item
@@ -243,36 +149,68 @@ const App = () => {
         </Form.Item>
 
         <Form.Item
-          name="donation"
-          label="Donation"
+          name="gender"
+          label="Gender[only one]"
           rules={[
             {
               required: true,
-              message: "Please input donation amount!",
+              message: "Please select gender!",
             },
           ]}
         >
-          <InputNumber
-            addonAfter={suffixSelector}
-            style={{
-              width: "100%",
-            }}
-          />
+          <Select placeholder="select your gender">
+            <Option value="male">Male</Option>
+            <Option value="female">Female</Option>
+            <Option value="other">Other</Option>
+          </Select>
         </Form.Item>
 
-        <Form.Item name="slider" label="Slider">
-          <Slider
-            marks={{
-              0: "A",
-              20: "B",
-              40: "C",
-              60: "D",
-              80: "E",
-              100: "F",
-            }}
-          />
+        <Form.Item
+          name="select-multiple"
+          label="Select[multiple]"
+          rules={[
+            {
+              required: true,
+              message: "Please select your favourite colors!",
+              type: "array",
+            },
+          ]}
+        >
+          <Select mode="multiple" placeholder="Please select favourite colors">
+            <Option value="red">Red</Option>
+            <Option value="green">Green</Option>
+            <Option value="blue">Blue</Option>
+          </Select>
         </Form.Item>
 
+        <Form.Item label="InputNumber">
+          <Form.Item name="input-number" noStyle>
+            <InputNumber min={1} max={10} />
+          </Form.Item>
+          <span className="ant-form-text"> machines</span>
+        </Form.Item>
+
+        <Form.Item name="switch" label="Switch" valuePropName="checked">
+          <Switch />
+        </Form.Item>
+
+        <Form.Item
+          name="agreement"
+          valuePropName="checked"
+          rules={[
+            {
+              validator: (_, value) =>
+                value
+                  ? Promise.resolve()
+                  : Promise.reject(new Error("Should accept agreement")),
+            },
+          ]}
+          {...tailFormItemLayout}
+        >
+          <Checkbox>
+            I have read the <a href="">agreement</a>
+          </Checkbox>
+        </Form.Item>
         <Form.Item {...tailFormItemLayout}>
           <Button type="primary" htmlType="submit">
             Submit
