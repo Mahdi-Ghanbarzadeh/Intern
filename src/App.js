@@ -1,4 +1,4 @@
-// 10
+// 7
 import {
   AutoComplete,
   Button,
@@ -15,75 +15,14 @@ import {
   Rate,
   Radio,
   Space,
-  Upload,
-  DatePicker,
-  TimePicker,
-  Avatar,
-  Typography,
-  Modal,
 } from "antd";
-import {
-  MinusCircleOutlined,
-  PlusOutlined,
-  InboxOutlined,
-  UploadOutlined,
-  SmileOutlined,
-  UserOutlined,
-} from "@ant-design/icons";
-import React, { useState, useEffect, useRef } from "react";
+import { MinusCircleOutlined, PlusOutlined } from "@ant-design/icons";
+import React, { useState } from "react";
 import "antd/dist/antd.css"; // or 'antd/dist/antd.less'
 import "./App.css";
+import IPut from "iput";
+
 const { Option } = Select;
-const { RangePicker } = DatePicker;
-
-const residences = [
-  {
-    value: "iran",
-    label: "Iran",
-    children: [
-      {
-        value: "isfahan",
-        label: "Isfahan",
-        children: [
-          {
-            value: "isfahan",
-            label: "Isfahan",
-          },
-        ],
-      },
-      { value: "tehran", label: "Tehran" },
-    ],
-  },
-  {
-    value: "netherland",
-    label: "Netherland",
-    children: [
-      {
-        value: "limburg",
-        label: "Limburg",
-      },
-    ],
-  },
-];
-
-const config = {
-  rules: [
-    {
-      type: "object",
-      required: true,
-      message: "Please select time!",
-    },
-  ],
-};
-const rangeConfig = {
-  rules: [
-    {
-      type: "array",
-      required: true,
-      message: "Please select time!",
-    },
-  ],
-};
 
 const formItemLayout = {
   labelCol: {
@@ -116,83 +55,24 @@ const tailFormItemLayout = {
   },
 };
 
-const normFile = (e) => {
-  console.log("Upload event:", e);
+// const CustomInput = ({ value, onChange }) => {
+//   console.log(value, onChange);
+//   return <input value={value} onChange={onChange} />;
+// };
 
-  if (Array.isArray(e)) {
-    return e;
-  }
-
-  return e?.fileList;
+const CustomInput = (props) => {
+  console.log(props);
+  return <input value={props.value} onChange={props.onChange} />;
 };
 
-// reset form fields when modal is form, closed
-const useResetFormOnCloseModal = ({ form, visible }) => {
-  const prevVisibleRef = useRef();
-  useEffect(() => {
-    prevVisibleRef.current = visible;
-  }, [visible]);
-  const prevVisible = prevVisibleRef.current;
-  useEffect(() => {
-    if (!visible && prevVisible) {
-      form.resetFields();
-    }
-  }, [form, prevVisible, visible]);
-};
-
-const ModalForm = ({ visible, onCancel }) => {
-  const [form] = Form.useForm();
-  useResetFormOnCloseModal({
-    form,
-    visible,
-  });
-
-  const onOk = () => {
-    form.submit();
-  };
-
-  return (
-    <Modal title="Add User" visible={visible} onOk={onOk} onCancel={onCancel}>
-      <Form form={form} layout="vertical" name="userForm">
-        <Form.Item
-          name="name"
-          label="User Name"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <Input />
-        </Form.Item>
-        <Form.Item
-          name="age"
-          label="User Age"
-          rules={[
-            {
-              required: true,
-            },
-          ]}
-        >
-          <InputNumber />
-        </Form.Item>
-      </Form>
-    </Modal>
-  );
+const CustomIP = (props) => {
+  console.log(props);
+  return <IPut defaultValue={props.value} onChange={props.onChange} />;
+  // return <input value={value} onChange={onChange} />;
 };
 
 const App = () => {
   const [form] = Form.useForm();
-
-  const [visible, setVisible] = useState(false);
-
-  const showUserModal = () => {
-    setVisible(true);
-  };
-
-  const hideUserModal = () => {
-    setVisible(false);
-  };
 
   const onFinish = (values) => {
     console.log("Success: ", values);
@@ -240,145 +120,90 @@ const App = () => {
   }));
   return (
     <div className="App">
-      <Form.Provider
-        onFormFinish={(name, { values, forms }) => {
-          if (name === "userForm") {
-            const { register } = forms;
-            const users = register.getFieldValue("users") || [];
-            register.setFieldsValue({
-              users: [...users, values],
-            });
-            setVisible(false);
-          }
+      <Form
+        {...formItemLayout}
+        form={form}
+        name="register"
+        onFinish={onFinish}
+        initialValues={{
+          residence: ["zhejiang", "hangzhou", "xihu"],
+          prefix: "98",
+          custom: 102030,
+          ip: "111.111.111.010",
         }}
+        scrollToFirstError
       >
-        <Form
-          {...formItemLayout}
-          form={form}
-          name="register"
-          onFinish={onFinish}
-          initialValues={{
-            residence: ["zhejiang", "hangzhou", "xihu"],
-            prefix: "98",
-          }}
-          scrollToFirstError
-        >
-          <Form.Item
-            name="name"
-            label="Name"
-            rules={[
-              {
-                required: true,
-                message: "Please input your Name",
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
+        <Form.Item name="email" label="E-mail">
+          <Input />
+        </Form.Item>
 
-          <Form.Item
-            name="country"
-            label="Country"
-            rules={[
-              {
-                required: true,
-                message: "Please select Country!",
-              },
-            ]}
-          >
-            <Select placeholder="select your country">
-              <Option value="Iran">Iran</Option>
-              <Option value="Netherland">Netherland</Option>
-            </Select>
-          </Form.Item>
+        <Form.Item label="Custom" name="custom">
+          <CustomInput />
+        </Form.Item>
 
-          <Form.Item
-            name="city"
-            label="City"
-            rules={[
-              {
-                required: true,
-                message: "Please select City!",
-              },
-            ]}
-          >
-            <Select placeholder="select your city">
-              <Option value="Tehran">Tehran</Option>
-              <Option value="Isfahan">Isfahan</Option>
-            </Select>
-          </Form.Item>
+        <Form.Item label="IP" name="ip">
+          <CustomIP />
+        </Form.Item>
 
-          <Form.Item
-            name="countryCity"
-            label="Country - City"
-            rules={[
-              {
-                type: "array",
-                required: true,
-                message: "Please select your habitual residence!",
-              },
-            ]}
-          >
-            <Cascader options={residences} />
-          </Form.Item>
-
-          <Form.Item
-            name="group"
-            label="Group Name"
-            rules={[
-              {
-                required: true,
-              },
-            ]}
-          >
-            <Input />
-          </Form.Item>
-          <Form.Item
-            label="User List"
-            shouldUpdate={(prevValues, curValues) =>
-              prevValues.users !== curValues.users
-            }
-          >
-            {({ getFieldValue }) => {
-              const users = getFieldValue("users") || [];
-              return users.length ? (
-                <ul>
-                  {users.map((user, index) => (
-                    <li key={index} className="user">
-                      <Avatar icon={<UserOutlined />} />
-                      {user.name} - {user.age}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <Typography.Text className="ant-form-text" type="secondary">
-                  ( <SmileOutlined /> No user yet. )
-                </Typography.Text>
-              );
+        <Form.Item name="phone" label="Phone Number">
+          <Input
+            addonBefore={prefixSelector}
+            style={{
+              width: "100%",
             }}
-          </Form.Item>
+          />
+        </Form.Item>
 
-          <Form.Item>
-            <Button
-              htmlType="button"
-              style={{
-                margin: "0 8px",
-              }}
-              onClick={showUserModal}
-            >
-              Add User
-            </Button>
-          </Form.Item>
+        <Form.Item name="gender" label="Gender[only one]">
+          <Select placeholder="select your gender">
+            <Option value="male">Male</Option>
+            <Option value="female">Female</Option>
+            <Option value="other">Other</Option>
+          </Select>
+        </Form.Item>
 
-          <Form.Item {...tailFormItemLayout}>
-            <Button type="primary" htmlType="submit">
-              Submit
-            </Button>
-          </Form.Item>
+        <Form.Item name="select-multiple" label="Select[multiple]">
+          <Select mode="multiple" placeholder="Please select favourite colors">
+            <Option value="red">Red</Option>
+            <Option value="green">Green</Option>
+            <Option value="blue">Blue</Option>
+          </Select>
+        </Form.Item>
 
-          <ModalForm visible={visible} onCancel={hideUserModal} />
-        </Form>
-      </Form.Provider>
+        <Form.Item label="InputNumber">
+          <Form.Item name="input-number" noStyle>
+            <InputNumber min={1} max={10} />
+          </Form.Item>
+          <span className="ant-form-text"> machines</span>
+        </Form.Item>
+
+        <Form.Item name="switch" label="Switch" valuePropName="checked">
+          <Switch />
+        </Form.Item>
+
+        <Form.Item
+          name="agreement"
+          valuePropName="checked"
+          rules={[
+            {
+              validator: (_, value) =>
+                value
+                  ? Promise.resolve()
+                  : Promise.reject(new Error("Should accept agreement")),
+            },
+          ]}
+          {...tailFormItemLayout}
+        >
+          <Checkbox>
+            I have read the <a href="">agreement</a>
+          </Checkbox>
+        </Form.Item>
+        <Form.Item {...tailFormItemLayout}>
+          <Button type="primary" htmlType="submit">
+            Submit
+          </Button>
+        </Form.Item>
+      </Form>
     </div>
   );
 };
